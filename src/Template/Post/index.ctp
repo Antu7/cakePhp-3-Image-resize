@@ -14,7 +14,6 @@
         <div class="form-block">
             <input type="number" name="image_hight[]" placeholder="Image Hight">
 
-
             <br><br>
             Image Weight
             <input type="number" name="image_weight[]" placeholder="Image Weight">

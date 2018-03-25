@@ -21,11 +21,11 @@ class PostController extends AppController
     {
         $post = "";
         if ($this->request->is('post')) {
-            if (!empty($this->request->data['image']['name'])) {
+            if (!empty($this->request->data['image'])) {
 
+                $image_name = "antu" . uniqid(mt_rand(10, 15)) . 'jpg';
 
-                $uploadImg = $this->_move_image($this->request->data['image']);
-
+                $uploadImg = $this->_move_image($this->request->data('image'), $image_name);
 
 
                 $image_hight = $this->request->data['image_hight'];
@@ -37,7 +37,7 @@ class PostController extends AppController
 
 
                 $filename = $uploadImg;
-                $ext = ".jpg";  ///get ext
+                //$ext = ".jpg";  ///get ext
 
                 list($width, $height) = getimagesize($filename);
                 $src = imagecreatefromjpeg($filename);
@@ -54,22 +54,19 @@ class PostController extends AppController
 
                     imagecopyresampled($tmp, $src, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
 
-                    imagejpeg($tmp, $path2 . 'a' . $i . 'jpg', 100 );
-
-                    $rnd_name = 'photos_' . uniqid(mt_rand(10, 15)) . '_' . time() . '_50x50.' . $ext;
-
-                    $url = Router::url('/', true) . 'image/' . $rnd_name;
-
-                    $uploadpath = 'image/';
-
-                    $uploadfile = $uploadpath . $rnd_name;
+                    imagejpeg($tmp, $path2 . 'a' . uniqid(mt_rand(10, 15)) . '_' . time() . '_50x50.' . $i . 'jpg', 100);
 
 
+                    //$rnd_name = 'photos_' . uniqid(mt_rand(10, 15)) . '_' . time() . '_50x50.' . $ext;
+
+                    $url = Router::url('/', true) . 'image/';
+
+                    $uploadfile = $path2;
 
 
-                    if (move_uploaded_file($filename, $uploadfile)) {
+                    if (move_uploaded_file($image_name, $uploadfile)) {
                         $post = $this->Posts->newEntity();
-                        $post->name = $filename;
+                        $post->name = $image_name;
                         $post->image = $url;
                         if ($this->Posts->save($post)) {
                             $this->Flash->success(__('File Upload second'));
@@ -88,13 +85,14 @@ class PostController extends AppController
     }
 
 
-    private function _move_image($uploadImg)
+    private function _move_image($uploadImg, $image_name)
     {
-        $path = WWW_ROOT . 'image/main' . $uploadImg['name'];
+        $path = WWW_ROOT . 'image/' . $image_name;
 
 
         move_uploaded_file($uploadImg['tmp_name'], $path);
 
         return $path;
+
     }
 }
